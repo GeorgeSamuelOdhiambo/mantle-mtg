@@ -1,0 +1,7 @@
+{
+    "zip": {
+        "link":"https://mtgjson.com/api/v5/AllPrintingsCSVFiles.zip",
+        "zipPath":"D:\\AllPrintings.zip",
+        "extractPath":"D:\\AllPrintings"
+    }
+}
