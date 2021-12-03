@@ -20,7 +20,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 app.listen(2020,()=> {
-    // D.dwnExtract()
+    //D.dwnExtract()
     C.readCardsFiles()
 })
 module.exports = app;

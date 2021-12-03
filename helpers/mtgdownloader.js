@@ -2,6 +2,7 @@ const request = require("superagent");
 const fs = require("fs");
 const extract = require('extract-zip')
 const config = require('config');
+const {resolve} = require("path");
 
 const href = config.get('zip.link');
 const zipFile = config.get('zip.zipPath');
@@ -22,7 +23,7 @@ exports.dwnExtract = async() => {
 
 extractFiles = async() => {
     try {
-        await extract(zipFile, { dir: outputDir })
+        await extract(resolve(zipFile), { dir: resolve(outputDir) })
         console.info("complete extraction");
     } catch (error) {
         console.error(error);

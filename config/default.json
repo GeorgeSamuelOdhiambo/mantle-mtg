@@ -1,8 +1,10 @@
 {
   "zip": {
     "link": "https://mtgjson.com/api/v5/AllPrintingsCSVFiles.zip",
-    "zipPath": "D:\\AllPrintings.zip",
-    "extractPath": "D:\\AllPrintings"
+    "zipPath": ".\\downloads\\AllPrintings.zip",
+    "extractPath": ".\\downloads\\AllPrintings",
+    "resultCsvPath": ".\\downloads\\result\\",
+    "resultCsvPathArch": ".\\downloads\\archive\\"
   },
 
     "connection_string": "postgres://doadmin:i39qteslie9ixiiq@mantledb-main-do-user-6045094-0.b.db.ondigitalocean.com:25060/MantleMain",
