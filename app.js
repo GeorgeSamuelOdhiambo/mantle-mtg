@@ -3,6 +3,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var D = require('./helpers/mtgdownloader');
+var C = require('./helpers/cardscsv')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -19,6 +20,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 app.listen(2020,()=> {
-    D.dwnExtract()
+    // D.dwnExtract()
+    C.readCardsFiles()
 })
 module.exports = app;
