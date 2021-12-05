@@ -2,12 +2,14 @@
   "zip": {
     "link": "https://mtgjson.com/api/v5/AllPrintingsCSVFiles.zip",
     "zipPath": ".\\downloads\\AllPrintings.zip",
+    "tcgSkuPath": ".\\downloads\\TcgplayerSkus.json.zip",
     "extractPath": ".\\downloads\\AllPrintings",
     "resultCsvPath": ".\\downloads\\result\\",
     "resultCsvPathArch": ".\\downloads\\archive\\"
   },
 
-    "connection_string": "postgres://doadmin:i39qteslie9ixiiq@mantledb-main-do-user-6045094-0.b.db.ondigitalocean.com:25060/MantleMain",
+    "connection_string": "postgres://doadmin:i39qteslie9ixiiq@mantledb-main-do-user-6045094-0.b.db.ondigitalocean.com:25060/MantleMain?connect_timeout=30",
+    //"connection_string": "postgres://doadmin:i39qteslie9ixiiq@localhost:5433/defaultdb",
     "PGSSLMODE": true,
     "rejectUnauthorized": false
   
