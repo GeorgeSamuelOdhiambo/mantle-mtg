@@ -13,7 +13,6 @@ const util = require('util');
 const fse = require('fs-extra');
 const axios = require('axios');
 
-
 const cardsPath = `${config.get("zip.extractPath")}\\cards.csv`;
 const setsPath = `${config.get("zip.extractPath")}\\sets.csv`;
 const rulingsPath = `${config.get("zip.extractPath")}\\rulings.csv`;

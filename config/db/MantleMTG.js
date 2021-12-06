@@ -205,8 +205,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     date_created: {
       type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: "timezone(utc"
+      allowNull: true
     },
     date_updated: {
       type: DataTypes.DATE,
