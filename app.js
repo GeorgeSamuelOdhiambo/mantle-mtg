@@ -21,6 +21,6 @@ app.use('/users', usersRouter);
 
 app.listen(2020,()=> {
     // D.dwnExtract()
-    C.readCardsFiles()
+    // C.readCardsFiles()
 })
 module.exports = app;
