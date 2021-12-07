@@ -12,6 +12,7 @@ const {
 const util = require('util');
 const fse = require('fs-extra');
 const axios = require('axios');
+const store = require('store2');
 
 const cardsPath = `${config.get("zip.extractPath")}\\cards.csv`;
 const setsPath = `${config.get("zip.extractPath")}\\sets.csv`;
@@ -20,8 +21,8 @@ const tcgPlayerSkusPath = `${config.get("zip.extractPath")}\\TcgplayerSkus.json`
 const resultCsvPath = `${config.get("zip.resultCsvPath")}`;
 const resultCsvPathArch = `${config.get("zip.resultCsvPathArch")}`;
 const outputDir = config.get('zip.extractPath');
-const CSV_PATH = util.format('%s%s.%s', resultCsvPath, new Date().toISOString().substr(0, 19).split('T').join('').split('-').join('').split(':').join(''), 'csv')
-var columns = [{
+var CSV_PATH = "";
+const columns = [{
     id: "Status",
     title: "Status"
   },
@@ -211,10 +212,7 @@ var columns = [{
   }
 ]
 
-const csvWriter = createCsvWriter({
-  path: resolve(CSV_PATH),
-  header: columns
-});
+var csvWriter = {}
 
 var dataResult = [];
 var csvInitData = [];
@@ -226,16 +224,17 @@ var rCount = 0;
 var execTime = 0;
 
 exports.readCardsFiles = async () => {
-
+  csvInitData = [];
   await loadSetData();
   await loadRulingsData();
   await loadTcgPlayerSku();
   await loadMantleMTGData();
   await createResultsCsv();
-
-  fs.createReadStream(resolve(cardsPath))
+  await initCsvWriter();
+  await fs.createReadStream(resolve(cardsPath))
     .on("error", (error) => {
       console.error(error);
+      store.set("TASK_RUNNING", false);
     })
 
     .pipe(csv())
@@ -245,15 +244,50 @@ exports.readCardsFiles = async () => {
 
     .on("end", async () => {
       await processRecords();
+      store.set("TASK_RUNNING", false);
       console.info("CSV Data Processing end");
     });
 };
 
+/**
+ * 
+ * @returns Initialize cqv record with headers
+ */
+const initCsvWriter = ()=> new Promise(async(resolved, reject)=>{
+
+  try {
+    CSV_PATH = util.format('%s%s.%s', resultCsvPath, new Date().toISOString().substr(0, 19).split('T').join('').split('-').join('').split(':').join(''), 'csv');
+    csvWriter = createCsvWriter({
+      path: resolve(CSV_PATH),
+      header: columns,
+      alwaysQuote:true,
+      //append:true
+    });
+  
+    csvWriter.writeRecords([]).then(()=>{
+      //Once 1st record is created, now allow append
+      csvWriter = createCsvWriter({
+        path: resolve(CSV_PATH),
+        header: columns,
+        alwaysQuote:true,
+        append:true
+      });
+      resolved()
+    })
+    
+  } catch (err) {
+    console.error(err);
+    throw new Error(err)
+  }
+
+});
+
 //Load Sets.csv
-const loadSetData = async () => {
+const loadSetData = () => new Promise(async(resolved, reject)=>{
   await fs.createReadStream(resolve(setsPath))
     .on("error", (error) => {
       console.error(error);
+      reject()
     })
 
     .pipe(csv())
@@ -262,15 +296,17 @@ const loadSetData = async () => {
     })
     .on("end", async () => {
       console.info("Sets Data Loading Completed");
+      resolved()
     });
-}
+});
 
 //Load rulings.csv
 
-const loadRulingsData = async () => {
+const loadRulingsData = () => new Promise(async(resolved, reject)=>{
   await fs.createReadStream(resolve(rulingsPath))
     .on("error", (error) => {
       console.error(error);
+      reject()
     })
 
     .pipe(csv())
@@ -279,11 +315,14 @@ const loadRulingsData = async () => {
     })
     .on("end", async () => {
       console.info("Rulings Data Loading Completed");
+      resolved()
     });
-}
+
+});
 
 //Load TCG Player SKu
-const loadTcgPlayerSku = async () => {
+const loadTcgPlayerSku = () => new Promise(async(resolved, reject)=>{
+
   console.info("Loading TcgPlayerSku")
   let tcgSkudata = fs.readFileSync(resolve(tcgPlayerSkusPath), {
     encoding: "utf8"
@@ -291,16 +330,19 @@ const loadTcgPlayerSku = async () => {
 
   tcgPlayerSku = JSON.parse(tcgSkudata);
   console.info("Loading TcgPlayerSku Completed")
-}
+
+  resolved()
+}); 
 
 //Load downloaded MantleMTC table from main db
-const loadMantleMTGData = async()=>{
+const loadMantleMTGData = ()=> new Promise(async(resolved, reject)=>{
   console.info("Loading MTG mantle data")
   let jsonData = await fs.readFileSync(resolve(join(outputDir,'mantle_mtg_db.json')),{encoding:"utf8"});
 
   mantleMtgDBRecords = JSON.parse(jsonData);
   console.info("MTG mantle data completed")
-}
+  resolved()
+});
 
 //https://lavrton.com/javascript-loops-how-to-handle-async-await-6252dd3c795/
 
@@ -309,14 +351,16 @@ const processRecords = async () => {
   var dt = new Date();
 
   console.info("Processing started at " + dt.toISOString())
-  //csvInitData = csvInitData.splice(0,20)
-  // map array to promises
+  //uncomment just to test
+  //csvInitData = csvInitData.splice(0, 100)
+
   while (csvInitData.length) {
     var start = new Date();
-    await Promise.all(csvInitData.splice(0, 1000).map(processStage));
+    await Promise.all(csvInitData.splice(0, 100).map(processStage));
     var finish = new Date();
     execTime = execTime+(Math.abs(finish - start)/1000)
   }
+  // map array to promises
   //const promises = csvInitData.map(processStage);
   // wait until all promises are resolved
   //await Promise.all(promises);
@@ -368,6 +412,7 @@ const getCardVariants = async (csvRecord) => {
 
 const processStage = async (record) => {
   const cardData = await getCardVariants(record);
+  //console.log(cardData.length)
 
   const setData = csvSetsData.find(x => x["code"] == record["setCode"]);
   const rulingData = csvRulingsData.find(x => x["uuid"] == record["uuid"]);
@@ -515,7 +560,9 @@ const compareRecords = async (csvRecord, mantleRecord, setData, rulingData) => {
     recordDiff["Child Sku"] = csvRecord["childSKU"]
     recordDiff["Mantle SKU"] = csvRecord["childSKU"]
     //dataResult.push(recordDiff)
-    await generateResultCSv([recordDiff])
+    await generateResultCSv([recordDiff]).catch(err =>{
+      console.error(err)
+    })
   }
 
 };
@@ -584,7 +631,9 @@ const newRecords = async (csvRecord, setData, rulingData) => {
     newRecord["Child Sku"] = childSKU
     newRecord["Mantle SKU"] = childSKU
     //dataResult.push(newRecord)
-    await generateResultCSv([newRecord]);
+    await generateResultCSv([newRecord]).catch(err =>{
+      console.error(err)
+    });
   }
 
 }
@@ -609,23 +658,36 @@ const createResultsCsv = async () => {
   await fse.ensureDirSync(resolve(resultCsvPath));
 }
 
-const generateResultCSv = async (dataStageResult, retryCount = 0) => {
+const generateResultCSv = (dataStageResult, retryCount = 0) => new Promise(async(resolved, reject)=> {
   /* 
     console.info("Generating Results CSV Data")
     console.info(dataStageResult.length); */
-  rCount = rCount + dataStageResult.length;
-
-  if (dataStageResult.length > 0) {
-    try {
-      await csvWriter.writeRecords(dataStageResult).then(() => {
-        //console.log("Write to " + CSV_PATH + " successfully!")
-      })
-      
-    } catch (error) {
-      if(retryCount < 2){
-        await generateResultCSv(dataStageResult, retryCount+1)
+  try {
+    if (dataStageResult.length > 0) {
+      if(retryCount == 0)
+         rCount = rCount + dataStageResult.length;
+  
+      try {
+        csvWriter.writeRecords(dataStageResult).then(()=>{
+          resolved()
+        });
+        
+      } catch (error) {
+        console.error(error)
+        if(retryCount < 2){
+          await generateResultCSv(dataStageResult, retryCount+1)
+        }
+        else{
+          throw new Error(error)
+        }
       }
+  
     }
-
+    else{
+      resolved()
+    }
+  } catch (err) {
+    console.error(err)
+    throw new Error(err)
   }
-}
+});
