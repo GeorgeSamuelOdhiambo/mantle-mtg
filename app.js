@@ -22,15 +22,9 @@ app.use(bodyParser.json());
 
 app.use('/', indexRouter);
 
-<<<<<<< HEAD
-app.listen(2020,()=> {
-    // D.dwnExtract()
-    // C.readCardsFiles()
-=======
 app.listen(2020,async()=> {
 
     console.info("Started")
     cronJob.initCronJobs()
->>>>>>> 944ef6f83a91ed486514688156f887ed0db1d768
 })
 module.exports = app;
