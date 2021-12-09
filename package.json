@@ -15,6 +15,7 @@
     "adm-zip": "^0.5.9",
     "axios": "^0.24.0",
     "body-parser": "^1.19.0",
+    "ciql-json": "^1.9.6",
     "config": "^3.3.6",
     "connect-multiparty": "^2.2.0",
     "cookie-parser": "~1.4.4",
@@ -45,7 +46,8 @@
   "nodemonConfig": {
     "ignore": [
       "downloads/*",
-      "uploads/*"
+      "uploads/*",
+      "config/doc_result.json"
     ]
   }
 }

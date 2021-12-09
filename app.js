@@ -4,8 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cronJob = require("./helpers/cronJob")
-var C = require('./helpers/cardscsv')
-
 
 var indexRouter = require('./routes/index');
 
@@ -23,7 +21,6 @@ app.use(bodyParser.json());
 app.use('/', indexRouter);
 
 app.listen(2020,async()=> {
-
     console.info("Started")
     cronJob.initCronJobs()
 })

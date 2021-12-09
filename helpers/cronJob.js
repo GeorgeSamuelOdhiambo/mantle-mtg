@@ -7,7 +7,6 @@ const card = require("./cardscsv")
 const execFrequency = config.get("execFrequency");
 
 exports.initCronJobs = async()=>{
-    //card.readCardsFiles()
     var task = cron.schedule(execFrequency, async()=>{
         var taskRunning = store.get("TASK_RUNNING");
 

@@ -11,9 +11,11 @@ router.get('/', function(req, res, next) {
 
 router.get('/file', controllers.getFiles);
 router.get("/file/:fileName", controllers.downloadFile);
-
 router.post("/file/upload",multipartMiddleware, controllers.uploadMagicFile);
-
 router.post("/file/upload-pricing",multipartMiddleware, controllers.uploadTCGPricingFile);
 
+router.get("/status", controllers.getStatus);
+
+router.post("/config", controllers.updateConfig);
+router.get("/start-task", controllers.startTask);
 module.exports = router;

@@ -13,6 +13,7 @@ const util = require('util');
 const fse = require('fs-extra');
 const axios = require('axios');
 const store = require('store2');
+const ciqlJSON = require('ciql-json');
 
 const cardsPath = `${config.get("zip.extractPath")}\\cards.csv`;
 const setsPath = `${config.get("zip.extractPath")}\\sets.csv`;
@@ -21,6 +22,10 @@ const tcgPlayerSkusPath = `${config.get("zip.extractPath")}\\TcgplayerSkus.json`
 const resultCsvPath = `${config.get("zip.resultCsvPath")}`;
 const resultCsvPathArch = `${config.get("zip.resultCsvPathArch")}`;
 const outputDir = config.get('zip.extractPath');
+const limitRecords = config.get('limitRecords');
+const processType = config.get('processType');
+const docResultsJson = resolve(config.get("zip.docResultsJson"));
+var filename = "";
 var CSV_PATH = "";
 const columns = [{
     id: "Status",
@@ -256,7 +261,8 @@ exports.readCardsFiles = async () => {
 const initCsvWriter = ()=> new Promise(async(resolved, reject)=>{
 
   try {
-    CSV_PATH = util.format('%s%s.%s', resultCsvPath, new Date().toISOString().substr(0, 19).split('T').join('').split('-').join('').split(':').join(''), 'csv');
+    filename = util.format('%s.%s', new Date().toISOString().substr(0, 19).split('T').join('').split('-').join('').split(':').join(''), 'csv')
+    CSV_PATH = util.format('%s%s', resultCsvPath,filename);
     csvWriter = createCsvWriter({
       path: resolve(CSV_PATH),
       header: columns,
@@ -349,10 +355,11 @@ const loadMantleMTGData = ()=> new Promise(async(resolved, reject)=>{
 const processRecords = async () => {
 
   var dt = new Date();
-
+  rCount = 0;
   console.info("Processing started at " + dt.toISOString())
-  //uncomment just to test
-  //csvInitData = csvInitData.splice(0, 100)
+  if(limitRecords){
+    csvInitData = csvInitData.splice(0, limitRecords)
+  }
 
   while (csvInitData.length) {
     var start = new Date();
@@ -360,28 +367,21 @@ const processRecords = async () => {
     var finish = new Date();
     execTime = execTime+(Math.abs(finish - start)/1000)
   }
-  // map array to promises
-  //const promises = csvInitData.map(processStage);
-  // wait until all promises are resolved
-  //await Promise.all(promises);
-  //Using promise is faster but causes database overhead
 
-  /*for (var i = 0; i < csvInitData.length; i++) {
-    const cardData = await getCardVariants(csvInitData[i]);
-    /*for (var j = 0; j < cardData.length; j++) {
-      await processRecord(cardData[j]);
-    }*/
-  /* rCount=rCount+cardData.length
-    console.log(rCount)
-    const promises = cardData.map(processRecord);
-    await Promise.all(promises);
-  }*/
   dt = new Date();
   console.info("Processing ended at " + dt.toISOString());
   console.info("Number Of Records Processed");
   console.info(rCount);
   console.info("Total Execution Time in secs");
   console.info(execTime);
+
+  ciqlJSON.open(docResultsJson)
+        .pushTo("documents", {
+          filename: filename,
+          recordCount:rCount,
+          time:dt.toISOString()
+        })
+        .save()
 
   //await generateResultCSv();
 
@@ -428,10 +428,12 @@ const processRecord = async (record, setData, rulingData) => {
   if (childSKU != undefined && childSKU.trim().length) {
     const cardData = await getMTGCardById(childSKU);
 
-    if (cardData != null) {
+    if (cardData != null && (processType == 'all' || processType == 'updated')) {
       await compareRecords(record, cardData, setData, rulingData);
     } else {
-      await newRecords(record, setData, rulingData)
+      if(processType == 'all' || processType == 'new'){
+        await newRecords(record, setData, rulingData)
+      }
     }
   }
 }
