@@ -17,7 +17,12 @@
     <!-- jQuery library -->
     <script src="./javascripts/index.js"></script>
 
+    <script src="./javascripts/waitMe.min.js"></script>
+
     <link rel="stylesheet" href="/stylesheets/style.css" />
+    
+
+    <link href="/stylesheets/waitMe.min.css" rel="stylesheet"/>
   </head>
   <body>
     <div class="row">
@@ -47,7 +52,7 @@
             <form id="upload-magic" enctype="multipart/form-data">
               <div class="row form-group">
                 <div class="col-md-6 col-6">
-                  <label for="file">File</label>
+                  <label for="">File</label>
                   <input
                     type="file"
                     class="form-control"
@@ -57,7 +62,7 @@
                   />
                 </div>
                 <div class="col-md-6 col-6">
-                  <label for="file">Verification</label>
+                  <label for="">Verification</label>
                   <input
                     type="password"
                     class="form-control"
@@ -87,7 +92,7 @@
             <form id="upload-pricing" enctype="multipart/form-data">
               <div class="row form-group">
                 <div class="col-md-6 col-6">
-                  <label for="file">File</label>
+                  <label for="">File</label>
                   <input
                     type="file"
                     class="form-control"
@@ -97,7 +102,7 @@
                   />
                 </div>
                 <div class="col-md-6 col-6">
-                  <label for="file">Verification</label>
+                  <label for="">Verification</label>
                   <input
                     type="password"
                     class="form-control"
@@ -128,10 +133,23 @@
               <div class="row form-group">
                 <div class="col-md-3 col-3">
                   <label for="execFrequency">Execution Frequency</label>
+                  
                   <select class="form-select" id="execFrequency" name="execFrequency">
                     <option value="0 0 * * * *">Hourly</option>
-                    <option value="0 0 * * * *">Every 6 hours</option>
-                    <option value="0 0 * * * *">Daily</option>
+                    <option value="0 0 0 * * *">Daily</option>
+                    <option value="never">Never / Manual</option>
+                    <option value="0 0 */2 * * *">Every 2 hours</option>
+                    <option value="0 0 */3 * * *">Every 3 hours</option>
+                    <option value="0 0 */4 * * *">Every 4 hours</option>
+                    <option value="0 0 */5 * * *">Every 5 hours</option>
+                    <option value="0 0 */6 * * *">Every 6 hours</option>
+                    <option value="0 0 */7 * * *">Every 7 hours</option>
+                    <option value="0 0 */8 * * *">Every 8 hours</option>
+                    <option value="0 0 */9 * * *">Every 9 hours</option>
+                    <option value="0 0 */10 * * *">Every 10 hours</option>
+                    <option value="0 0 */11 * * *">Every 11 hours</option>
+                    <option value="0 0 */12 * * *">Every 12 hours</option>
+                    
                   </select>
                 </div>
                 <div class="col-md-4 col-4">

@@ -1,0 +1,9 @@
+{
+    "script": "./app.js",
+    "watch": true,
+    "ignore_watch": ["node_modules", "public","downloads","uploads","config/db","config/doc_result.json"],
+    "watch_options": {
+        "followSymlinks": false
+    },
+    "name": "mantle-downloader-svc"
+}

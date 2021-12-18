@@ -15,14 +15,14 @@ const axios = require('axios');
 const store = require('store2');
 const ciqlJSON = require('ciql-json');
 
-const cardsPath = `${config.get("zip.extractPath")}\\cards.csv`;
-const setsPath = `${config.get("zip.extractPath")}\\sets.csv`;
-const rulingsPath = `${config.get("zip.extractPath")}\\rulings.csv`;
-const tcgPlayerSkusPath = `${config.get("zip.extractPath")}\\TcgplayerSkus.json`;
+const cardsPath = join(`${config.get("zip.extractPath")}`,'cards.csv');
+const setsPath = join(`${config.get("zip.extractPath")}`,'sets.csv');
+const rulingsPath = join(`${config.get("zip.extractPath")}`,'rulings.csv');
+const tcgPlayerSkusPath = join(`${config.get("zip.extractPath")}`,'TcgplayerSkus.json');
 const resultCsvPath = `${config.get("zip.resultCsvPath")}`;
 const resultCsvPathArch = `${config.get("zip.resultCsvPathArch")}`;
 const outputDir = config.get('zip.extractPath');
-const limitRecords = config.get('limitRecords');
+const limitRecords = parseInt(config.get('limitRecords'));
 const processType = config.get('processType');
 const docResultsJson = resolve(config.get("zip.docResultsJson"));
 var filename = "";
@@ -357,7 +357,7 @@ const processRecords = async () => {
   var dt = new Date();
   rCount = 0;
   console.info("Processing started at " + dt.toISOString())
-  if(limitRecords){
+  if(limitRecords > 0){
     csvInitData = csvInitData.splice(0, limitRecords)
   }
 

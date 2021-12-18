@@ -12,7 +12,7 @@ const pricing = require("../helpers/pricingUpdates")
 const downloader = require("../helpers/mtgdownloader");
 const resultCsvPath = `${config.get("zip.resultCsvPath")}`;
 const passCode = config.get("passCode");
-let configFilePath = resolve(".\\config\\default.json");
+let configFilePath = resolve( join("config","default.json"));
 const docResultsJson = resolve(config.get("zip.docResultsJson"));
 
 
@@ -33,12 +33,14 @@ exports.getFiles = async (req, res) => {
         if(files){
             files.forEach((file) => {
                 const doc = docs["documents"].find(x => x.filename == file)
-                fileInfos.push({
-                    name: file,
-                    recordsCount:doc["recordCount"],
-                    dateTime:doc["time"],
-                    url: req.protocol + "://" + req.headers.host + "/" + "file/" + file,
-                });
+                if(doc != undefined){
+                    fileInfos.push({
+                        name: file,
+                        recordsCount:doc["recordCount"],
+                        dateTime:doc["time"],
+                        url: req.protocol + "://" + req.headers.host + "/" + "file/" + file,
+                    });
+                }
             });
         }
         res.status(200).send(fileInfos);
@@ -140,7 +142,7 @@ exports.updateConfig = async(req, res)=>{
         .save()
 
     res.send({
-        status:"oka"
+        status:"successful"
     })
 }
 

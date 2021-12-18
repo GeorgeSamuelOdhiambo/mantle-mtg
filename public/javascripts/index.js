@@ -2,6 +2,7 @@ $(document).ready(function (e) {
 
   $("#upload-magic").on("submit", function (e) {
     e.preventDefault();
+    run_wait();
     $.ajax({
       type: "POST",
       url: "/file/upload",
@@ -19,8 +20,7 @@ $(document).ready(function (e) {
             filename = matches[1].replace(/['"]/g, "");
         }
         var type = request.getResponseHeader("Content-Type");
-        alert(filename);
-        alert(type);
+        
         var blob = new Blob([response], {
           type: type
         });
@@ -45,19 +45,21 @@ $(document).ready(function (e) {
               a.click();
             }
           } else {
-            window.location = downloadUrl;
+            //window.location = downloadUrl;
+            alert("Error")
           }
           setTimeout(function () {
             URL.revokeObjectURL(downloadUrl);
           }, 100); // cleanup
         }
+        stop_wait();
       },
     });
   });
 
   $("#upload-pricing").on("submit", function (e) {
     e.preventDefault();
-    console.log(e);
+    run_wait();
     $.ajax({
       type: "POST",
       url: "/file/upload-pricing",
@@ -65,11 +67,14 @@ $(document).ready(function (e) {
       contentType: false,
       cache: false,
       processData: false,
-      success: alert("Uploaded")
+      success: function (response, textStatus, request) {
+        alert(JSON.stringify(response))
+        stop_wait();
+      }
     });
   });
 
-  getStatus()
+  getStatus(true)
   setInterval(function () {
     getStatus();
   }, 5000);
@@ -84,6 +89,7 @@ $(document).ready(function (e) {
 
   $("#config-form").on("submit", function (e) {
     e.preventDefault();
+    run_wait();
     var formData = {
       execFrequency: $("#execFrequency").val(),
       limitRecords: $("#limitRecords").val(),
@@ -99,7 +105,8 @@ $(document).ready(function (e) {
       contentType: "application/json",
       processData: false,
       success: function (response) {
-        alert(JSON.stringify(response))
+        alert(JSON.stringify(response));
+        stop_wait();
       }
     })
   });
@@ -121,7 +128,7 @@ $(document).ready(function (e) {
 
 });
 
-const getStatus = async () => {
+const getStatus = async (init = false) => {
 
   $.ajax({
     method: "GET",
@@ -137,22 +144,46 @@ const getStatus = async () => {
         No Job execution in progress! <button type="button" class="brn btn-primary btn-sm ml-6" onclick="startJob()">Start Job</button>
       </div>`)
       }
-      $("#execFrequency").val(response.execFrequency);
-      $("#limitRecords").val(response.limitRecords);
-      $("#processType").val(response.processType);
+      if (init) {
+        $("#execFrequency").val(response.execFrequency);
+        $("#limitRecords").val(response.limitRecords);
+        $("#processType").val(response.processType);
+      }
     },
   });
 };
 
 const startJob = async () => {
+  run_wait();
   $.ajax({
     method: "GET",
     url: "/start-task",
     success: function (response) {
       getStatus()
+      stop_wait();
     },
     error: function (request, status, error) {
       alert(request.responseText);
+      stop_wait();
     }
   });
+}
+
+function run_wait() {
+  $('body > div').waitMe({
+    effect: 'ios',
+    text: 'Please wait...',
+    bg: 'rgba(255,255,255,0.7)',
+    color: '#000',
+    maxSize: 30,
+    waitTime: -1,
+    source: 'img.svg',
+    textPos: 'horizontal',
+    fontSize: '18px',
+    onClose: function (el) {}
+  });
+}
+
+function stop_wait(){
+  $('body > div').waitMe('hide');
 }
