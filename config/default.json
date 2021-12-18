@@ -13,7 +13,7 @@
     "PGSSLMODE": false,
     "rejectUnauthorized": false,
     "passCode": "123456",
-    "execFrequency": "0 0 * * * *",
-    "limitRecords": "10",
-    "processType": "new"
+    "execFrequency": "never",
+    "limitRecords": "5",
+    "processType": "all"
 }

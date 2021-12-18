@@ -214,6 +214,10 @@ const columns = [{
   {
     id: "Buylist Price",
     title: "Buylist Price"
+  },
+  {
+    id: "multiverseId",
+    title: "multiverseId"
   }
 ]
 
@@ -447,8 +451,8 @@ const getMTGCardById = async (childSKU) => {
       raw: true,
       logging: false,
     });*/
-
-    return mantleMtgDBRecords.find(x => x["Child Sku"] == parseInt(childSKU));
+    if(mantleMtgDBRecords != null)
+      return mantleMtgDBRecords.find(x => x["Child Sku"] == parseInt(childSKU));
 
   } catch (error) {
     console.error(error)
@@ -548,6 +552,8 @@ const compareRecords = async (csvRecord, mantleRecord, setData, rulingData) => {
   //Card Number
   recordDiff["Card Number"] = await getRecordsDiff("number", "Card Number", csvRecord, mantleRecord);
 
+  //multiverseId
+  recordDiff["multiverseId"] = await getRecordsDiff("multiverseId","multiverseId", csvRecord, mantleRecord)
 
 
   //remove nulls
@@ -620,6 +626,7 @@ const newRecords = async (csvRecord, setData, rulingData) => {
     "Flavor Text": csvRecord["flavorText"],
     "Artist": csvRecord["artist"],
     "Card Number": csvRecord["number"],
+    "multiverseId":csvRecord["multiverseId"]
   }
   //remove nulls
   for (var key in newRecord) {

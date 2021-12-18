@@ -67,7 +67,7 @@ const sanitizeRecord = (record) => {
 const getRecordSQL = async(record)=>{
 
     delete record["Status"]
-    record["date_updated"] = new Date(new Date().toUTCString());
+    record["date_updated"] = `timezone('utc'::text, now()))`;//new Date(new Date().toUTCString());
 
     let sql = await db.sequelize.dialect.queryGenerator.insertQuery(
         db.MantleMTG.getTableName(),
@@ -85,7 +85,7 @@ const getRecordSQL = async(record)=>{
         
     );
 
-    fs.appendFileSync(resolve(sqlOutput), sql.query+"\n");
+    fs.appendFileSync(resolve(sqlOutput), sql.query.replace(`'timezone(''utc''::text, now()))'`,`timezone('utc'::text, now()))`)+"\n");
 
     //console.log(sql.query)
 }

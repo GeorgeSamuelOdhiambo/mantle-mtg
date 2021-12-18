@@ -187,6 +187,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: true
     },
+    'multiverseId': {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    'Image': {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     brand_id: {
       type: DataTypes.BIGINT,
       allowNull: true
