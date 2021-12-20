@@ -26,6 +26,7 @@
     "express": "~4.16.1",
     "extract-zip": "^2.0.1",
     "fs-extra": "^10.0.0",
+    "glob": "^7.2.0",
     "morgan": "~1.9.1",
     "multer": "^1.4.3",
     "node-cron": "^3.0.0",
@@ -47,7 +48,9 @@
     "ignore": [
       "downloads/*",
       "uploads/*",
-      "config/doc_result.json"
+      "config/doc_result.json",
+      "config/mtg_image_ids.json",
+      "config/mtg_image_results.json"
     ]
   }
 }
