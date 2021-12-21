@@ -21,6 +21,7 @@ const imageIdsPath = resolve(config.get("images.mtg.imageIds"));
 const downloadPath = config.get("images.mtg.downloadPath");
 const imageResultsPath = resolve(config.get("images.mtg.imageResults"));
 const imageZipPath = resolve(config.get("images.mtg.zipPath"));
+const limitImages = parseInt(config.get("imgLimitRecords"));
 var downLoadedImages = [];
 var multiverseIds = [];
 var newMultiverseIds = [];
@@ -30,6 +31,9 @@ var _newMultiverseIds = [];
 var allProcessedId = []
 
 exports.dwnZipImages = async()=>{
+
+    store.set("IMG_TASK_RUNNING", true);
+
     await getExistingImageIds();
     await getCardMultiverseIds();
 
@@ -39,6 +43,8 @@ exports.dwnZipImages = async()=>{
     });
 
     await processRecords();
+
+    store.set("IMG_TASK_RUNNING", false);
 
 }
 
@@ -73,11 +79,16 @@ const getCardMultiverseIds = ()=> new Promise(async(resolved, reject)=>{
 });
 
 const processRecords = async () => {
-    newMultiverseIds = newMultiverseIds.splice(0,0);
+    if(limitImages)
+        newMultiverseIds = newMultiverseIds.splice(0,limitImages);
+        
     allProcessedId = downLoadedImages.concat(newMultiverseIds);
     _newMultiverseIds = JSON.parse(JSON.stringify(newMultiverseIds));
+    total = newMultiverseIds.length;
 
     while (newMultiverseIds.length) {
+        store.set("IMG_PROCESSING_COUNT", `remaining ${newMultiverseIds.length} of ${total}`);
+
         var start = new Date();
         await Promise.all(newMultiverseIds.splice(0, 100).map(downLoadImage));
         var finish = new Date();

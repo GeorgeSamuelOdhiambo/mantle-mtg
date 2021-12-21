@@ -9,8 +9,8 @@
         "uploadsPath": "uploads/",
         "docResultsJson": "config/doc_result.json"
     },
-    "images":{
-        "mtg":{
+    "images": {
+        "mtg": {
             "imageIds": "config/mtg_image_ids.json",
             "imageResults": "config/mtg_image_ids.json",
             "downloadPath": "downloads/images/mtg/",
@@ -23,5 +23,7 @@
     "passCode": "123456",
     "execFrequency": "never",
     "limitRecords": "5",
-    "processType": "all"
+    "processType": "all",
+    "imgExecFrequency": "never",
+    "imgLimitRecords": "0"
 }

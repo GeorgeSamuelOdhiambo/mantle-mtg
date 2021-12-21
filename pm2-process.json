@@ -1,7 +1,7 @@
 {
     "script": "./app.js",
     "watch": true,
-    "ignore_watch": ["node_modules", "public","downloads","uploads","config/db","config/doc_result.json"],
+    "ignore_watch": ["node_modules", "public","downloads","uploads","config/db","config/doc_result.json","config/mtg_image_ids.json","config/mtg_image_results.json"],
     "watch_options": {
         "followSymlinks": false
     },

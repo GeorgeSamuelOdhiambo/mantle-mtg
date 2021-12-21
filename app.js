@@ -7,7 +7,6 @@ var cronJob = require("./helpers/cronJob")
 
 var indexRouter = require('./routes/index');
 var imagesRouter = require('./routes/images');
-const dwnZipImages = require('./helpers/mtgImagesDownloader')
 
 var app = express();
 
@@ -25,7 +24,5 @@ app.use('/images', imagesRouter);
 app.listen(2020,async()=> {
     console.info("Started")
     cronJob.initCronJobs()
-
-    await dwnZipImages.dwnZipImages();
 })
 module.exports = app;
