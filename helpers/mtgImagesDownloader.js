@@ -16,11 +16,13 @@ const ciqlJSON = require('ciql-json');
 const store = require('store2');
 const AdmZip = require('adm-zip');
 const glob = require('glob');
+const exec = require('child_process').exec, child;
 const cardsPath = join(`${config.get("zip.extractPath")}`,'cards.csv');
 const imageIdsPath = resolve(config.get("images.mtg.imageIds"));
 const downloadPath = config.get("images.mtg.downloadPath");
 const imageResultsPath = resolve(config.get("images.mtg.imageResults"));
 const imageZipPath = resolve(config.get("images.mtg.zipPath"));
+const bashZip = resolve(config.get("images.mtg.bashZip"));
 const limitImages = parseInt(config.get("imgLimitRecords"));
 var downLoadedImages = [];
 var multiverseIds = [];
@@ -99,7 +101,7 @@ const processRecords = async () => {
 
     await updateImageIds();
 
-    //await archiveImages();
+    await archiveImages();
 }
 
 const downLoadImage = (multiverse_id) => new Promise(async(resolved, reject)=>{
@@ -155,9 +157,9 @@ const updateDBImageUrl = ()=> new Promise(async(resolved, reject)=>{
 });
 
 const archiveImages = ()=> new Promise(async(resolved, reject)=>{
-    try {
-        console.log(resolve(downloadPath))
-        glob(resolve(downloadPath) + '/**/*.jpeg', {}, (err, files)=>{
+   /*  try {
+        console.log(resolve(downloadPath))*/
+        /*glob(resolve(downloadPath) + '/**//*.jpeg', {}, (err, files)=>{
             console.log(files.length);
             files.forEach(file => {
                 adminZip.addLocalFile(file);
@@ -174,5 +176,14 @@ const archiveImages = ()=> new Promise(async(resolved, reject)=>{
         console.error(error);
         reject()
     }
-    const adminZip = new AdmZip();
+    const adminZip = new AdmZip(); */
+
+    const archive = exec(bashZip);
+    archive.stdout.on('data', (data)=>{
+        console.log(data); 
+        // do whatever you want here with data
+    });
+    archive.stderr.on('data', (data)=>{
+        console.error(data);
+    });
 });

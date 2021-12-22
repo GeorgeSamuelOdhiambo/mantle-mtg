@@ -14,7 +14,8 @@
             "imageIds": "config/mtg_image_ids.json",
             "imageResults": "config/mtg_image_ids.json",
             "downloadPath": "downloads/images/mtg/",
-            "zipPath": "downloads/images/"
+            "zipPath": "downloads/images/",
+            "bashZip":"config/archive.sh"
         }
     },
     "connection_string": "postgres://doadmin:i39qteslie9ixiiq@localhost:5433/defaultdb",
