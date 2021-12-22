@@ -178,12 +178,19 @@ const archiveImages = ()=> new Promise(async(resolved, reject)=>{
     }
     const adminZip = new AdmZip(); */
 
-    const archive = exec(bashZip);
-    archive.stdout.on('data', (data)=>{
-        console.log(data); 
-        // do whatever you want here with data
-    });
-    archive.stderr.on('data', (data)=>{
-        console.error(data);
-    });
+    try {
+        const archive = exec(bashZip);
+        archive.stdout.on('data', (data)=>{
+            console.log(data); 
+            // do whatever you want here with data
+        });
+        archive.stderr.on('data', (data)=>{
+            console.error(data);
+        });
+    
+        resolved()
+        
+    } catch (error) {
+        reject()
+    }
 });
