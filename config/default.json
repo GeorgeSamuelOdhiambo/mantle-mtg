@@ -1,7 +1,34 @@
 {
     "zip": {
-        "link":"https://mtgjson.com/api/v5/AllPrintingsCSVFiles.zip",
-        "zipPath":"D:\\AllPrintings.zip",
-        "extractPath":"D:\\AllPrintings"
-    }
+        "link": "https://mtgjson.com/api/v5/AllPrintingsCSVFiles.zip",
+        "zipPath": "downloads/AllPrintings.zip",
+        "tcgSkuPath": "downloads/TcgplayerSkus.json.zip",
+        "extractPath": "downloads/AllPrintings",
+        "resultCsvPath": "downloads/result/",
+        "resultCsvPathArch": "downloads/archive/",
+        "uploadsPath": "uploads/",
+        "docResultsJson": "config/doc_result.json"
+    },
+    "images": {
+        "mtg": {
+            "imageIds": "config/mtg_image_ids.json",
+            "imageResults": "config/mtg_image_ids.json",
+            "downloadPath": "downloads/images/mtg/",
+            "zipPath": "downloads/images/",
+            "bashZip": "config/archive.sh"
+        },
+        "ygo":{
+            "imageIds": "config/ygo_image_ids.json",
+            "downloadPath": "downloads/images/ygo/"
+        }
+    },
+    "connection_string": "postgres://doadmin:i39qteslie9ixiiq@localhost:5433/defaultdb",
+    "PGSSLMODE": false,
+    "rejectUnauthorized": false,
+    "passCode": "123456",
+    "execFrequency": "never",
+    "limitRecords": "0",
+    "processType": "all",
+    "imgExecFrequency": "never",
+    "imgLimitRecords": "0"
 }
