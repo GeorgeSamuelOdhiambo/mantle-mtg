@@ -86,7 +86,7 @@ const processRecords = async () => {
         
     allProcessedId = downLoadedImages.concat(newMultiverseIds);
     _newMultiverseIds = JSON.parse(JSON.stringify(newMultiverseIds));
-    total = newMultiverseIds.length;
+    const total = newMultiverseIds.length;
 
     while (newMultiverseIds.length) {
         store.set("IMG_PROCESSING_COUNT", `remaining ${newMultiverseIds.length} of ${total}`);
@@ -156,7 +156,7 @@ const updateDBImageUrl = ()=> new Promise(async(resolved, reject)=>{
     }
 });
 
-const archiveImages = ()=> new Promise(async(resolved, reject)=>{
+exports.archiveImages = ()=> new Promise(async(resolved, reject)=>{
    /*  try {
         console.log(resolve(downloadPath))*/
         /*glob(resolve(downloadPath) + '/**//*.jpeg', {}, (err, files)=>{

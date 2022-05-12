@@ -7,6 +7,8 @@ var cronJob = require("./helpers/cronJob")
 
 var indexRouter = require('./routes/index');
 var imagesRouter = require('./routes/images');
+var yughioRouter = require('./routes/yughio');
+var yughioImgRouter = require('./routes/yughio_images');
 
 var app = express();
 
@@ -20,6 +22,8 @@ app.use(bodyParser.json());
 
 app.use('/', indexRouter);
 app.use('/images', imagesRouter);
+app.use('/yughio', yughioRouter);
+app.use('/yughio_images', yughioImgRouter);
 
 app.listen(2020,async()=> {
     console.info("Started")

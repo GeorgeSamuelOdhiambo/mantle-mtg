@@ -61,17 +61,29 @@ const getStatus = async (init = false) => {
     success: function (response) {
 
       if (response.status) {
-        if(init){
+        if (init) {
           run_wait()
         }
         $("#jobstatus").html(`<div class="alert alert-danger" role="alert">
         Images download job execution in progress ${response.recordCount} - Kindly wait until completion! 
       </div>`)
+
+      //============
+      $("#jobstatus_ygo").html(`<div class="alert alert-danger" role="alert">
+      Images download job execution in progress ${response.recordCount} - Kindly wait until completion! 
+    </div>`)
+
       } else {
         stop_wait()
         $("#jobstatus").html(`<div class="alert alert-success" role="alert">
         No download job execution in progress! <button type="button" class="brn btn-primary btn-sm ml-6" onclick="startJob()">Start Downloads</button>
       </div>`)
+
+      //============
+        $("#jobstatus_ygo").html(`<div class="alert alert-success" role="alert">
+        No download job execution in progress! <button type="button" class="brn btn-primary btn-sm ml-6" onclick="startJobYgo()">Start Downloads</button>
+      </div>`)
+      
       }
       if (init) {
         $("#execFrequency").val(response.execFrequency);
@@ -98,6 +110,22 @@ const startJob = async () => {
   });
 }
 
+const startJobYgo = async () => {
+  run_wait();
+  $.ajax({
+    method: "GET",
+    url: "/yughio_images/start-task",
+    success: function (response) {
+      getStatus()
+      stop_wait();
+    },
+    error: function (request, status, error) {
+      alert(request.responseText);
+      stop_wait();
+    }
+  });
+}
+
 function run_wait() {
   $('body > div').waitMe({
     effect: 'ios',
@@ -109,10 +137,10 @@ function run_wait() {
     source: 'img.svg',
     textPos: 'horizontal',
     fontSize: '18px',
-    onClose: function (el) {}
+    onClose: function (el) { }
   });
 }
 
-function stop_wait(){
+function stop_wait() {
   $('body > div').waitMe('hide');
 }

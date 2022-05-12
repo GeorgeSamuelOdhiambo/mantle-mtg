@@ -195,6 +195,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: true
     },
+    'Foil': {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     brand_id: {
       type: DataTypes.BIGINT,
       allowNull: true

@@ -14,6 +14,7 @@
     "@babel/core": "^7.16.0",
     "adm-zip": "^0.5.9",
     "axios": "^0.24.0",
+    "axios-middleware": "^0.3.1",
     "body-parser": "^1.19.0",
     "ciql-json": "^1.9.6",
     "config": "^3.3.6",
@@ -50,7 +51,8 @@
       "uploads/*",
       "config/doc_result.json",
       "config/mtg_image_ids.json",
-      "config/mtg_image_results.json"
+      "config/mtg_image_results.json",
+      "config/ygo_image_ids.json"
     ]
   }
 }

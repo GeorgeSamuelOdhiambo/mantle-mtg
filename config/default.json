@@ -15,7 +15,11 @@
             "imageResults": "config/mtg_image_ids.json",
             "downloadPath": "downloads/images/mtg/",
             "zipPath": "downloads/images/",
-            "bashZip":"config/archive.sh"
+            "bashZip": "config/archive.sh"
+        },
+        "ygo":{
+            "imageIds": "config/ygo_image_ids.json",
+            "downloadPath": "downloads/images/ygo/"
         }
     },
     "connection_string": "postgres://doadmin:i39qteslie9ixiiq@localhost:5433/defaultdb",
@@ -23,7 +27,7 @@
     "rejectUnauthorized": false,
     "passCode": "123456",
     "execFrequency": "never",
-    "limitRecords": "5",
+    "limitRecords": "0",
     "processType": "all",
     "imgExecFrequency": "never",
     "imgLimitRecords": "0"

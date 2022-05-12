@@ -218,6 +218,10 @@ const columns = [{
   {
     id: "multiverseId",
     title: "multiverseId"
+  },
+  {
+    id:"Foil",
+    title:"Foil"
   }
 ]
 
@@ -237,7 +241,7 @@ exports.readCardsFiles = async () => {
   await loadSetData();
   await loadRulingsData();
   await loadTcgPlayerSku();
-  await loadMantleMTGData();
+  //await loadMantleMTGData(); Yonah
   await createResultsCsv();
   await initCsvWriter();
   await fs.createReadStream(resolve(cardsPath))
@@ -398,13 +402,17 @@ const getCardVariants = async (csvRecord) => {
   if (tcgSkuData) {
 
     tcgSkuData.filter(x => x.language.toLowerCase() == "english").forEach(tcgSku => {
+      console.log('tcgSku tcgSku')
+      console.log(tcgSku)
+
       cardVariants.push({
         ...csvRecord,
         ...{
           childSKU: tcgSku["skuId"],
           parentSKU: tcgSku["productId"],
           condition: tcgSku["condition"],
-          language: tcgSku["language"]
+          language: tcgSku["language"],
+          printing: tcgSku["printing"]
         }
       });
 
@@ -430,7 +438,7 @@ const processRecord = async (record, setData, rulingData) => {
   const childSKU = record["childSKU"].toString();
   //console.log(childSKU)
   if (childSKU != undefined && childSKU.trim().length) {
-    const cardData = await getMTGCardById(childSKU);
+    const cardData = null//await getMTGCardById(childSKU); Yonah 
 
     if (cardData != null && (processType == 'all' || processType == 'updated')) {
       await compareRecords(record, cardData, setData, rulingData);
@@ -509,6 +517,9 @@ const compareRecords = async (csvRecord, mantleRecord, setData, rulingData) => {
 
   //Description
   recordDiff["Description"] = await getRecordsDiff("text", "Description", csvRecord, mantleRecord);
+
+  //Foil
+  recordDiff["Foil"] = await getRecordsDiff("printing", "Foil", csvRecord, mantleRecord);
 
   //Short Code
   try {
@@ -626,7 +637,8 @@ const newRecords = async (csvRecord, setData, rulingData) => {
     "Flavor Text": csvRecord["flavorText"],
     "Artist": csvRecord["artist"],
     "Card Number": csvRecord["number"],
-    "multiverseId":csvRecord["multiverseId"]
+    "multiverseId":csvRecord["multiverseId"],
+    "Foil":csvRecord["printing"]
   }
   //remove nulls
   for (var key in newRecord) {

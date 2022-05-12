@@ -34,7 +34,7 @@ exports.dwnExtract = async () => {
       console.info("Downloading .zip files completed");
       await extractFiles(zipFile, outputDir);
       await downloadTcgPlayerSkus();
-      await downloadMantleMTGRecords();
+      //await downloadMantleMTGRecords(); Yonah
       console.info("Downloads Completed");
 
       dt = new Date();

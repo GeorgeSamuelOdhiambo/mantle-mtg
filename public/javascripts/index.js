@@ -54,6 +54,13 @@ $(document).ready(function (e) {
         }
         stop_wait();
       },
+      error: function(xhr, textStatus, error){
+          console.log(xhr.statusText);
+          console.log(textStatus);
+          console.log(error);
+          alert(error)
+          stop_wait()
+      }
     });
   });
 
@@ -70,6 +77,13 @@ $(document).ready(function (e) {
       success: function (response, textStatus, request) {
         alert(JSON.stringify(response))
         stop_wait();
+      },
+      error: function(xhr, textStatus, error){
+          console.log(xhr.statusText);
+          console.log(textStatus);
+          console.log(error);
+          alert(error)
+          stop_wait()
       }
     });
   });
