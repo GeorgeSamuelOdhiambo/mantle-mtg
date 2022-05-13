@@ -58,7 +58,7 @@ exports.startTImageTask = async(req, res) =>{
         }
         else{
             res.status(500).send({
-                error:"No uploaded Yughio data was found, upload the CVS before processing the images"
+                error:"No uploaded Yugioh data was found, upload the CVS before processing the images"
             })
         }
     }

@@ -114,7 +114,7 @@ const startJobYgo = async () => {
   run_wait();
   $.ajax({
     method: "GET",
-    url: "/yughio_images/start-task",
+    url: "/yugioh_images/start-task",
     success: function (response) {
       getStatus()
       stop_wait();

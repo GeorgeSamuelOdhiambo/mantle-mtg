@@ -4,7 +4,7 @@ $(document).ready(function (e) {
         run_wait();
         $.ajax({
           type: "POST",
-          url: "/yughio/file/upload",
+          url: "/yugioh/file/upload",
           data: new FormData(this),
           contentType: false,
           cache: false,

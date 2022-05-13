@@ -133,7 +133,7 @@ exports.populateRecords = (fileName, downloadImages=0) => new Promise(async (res
             await processAllCached()
             await updateImageIds()
             store.set("TASK_RUNNING", false);
-            console.info("Yughio CSV Data Processing end");
+            console.info("Yugioh CSV Data Processing end");
             if(downloadImages == 1){
                 try {
                     ygoImageDownloader.dwnZipImages()
@@ -146,7 +146,7 @@ exports.populateRecords = (fileName, downloadImages=0) => new Promise(async (res
 });
 
 const initCsvWriter = (row) => new Promise(async (resolved, reject) => {
-    console.log('Initializing Yughio data')
+    console.log('Initializing Yugioh data')
     csvInitialized = true;
 
     for (const [key, value] of Object.entries(row)) {
@@ -321,7 +321,7 @@ const getCardData = async (card_name, shortCode, reTry = false) => {
 }
 
 const generateResultCSv = (dataStageResult = [], retryCount = 0) => new Promise(async (resolved, reject) => {
-    console.log("Generating Yughio cvs")
+    console.log("Generating Yugioh cvs")
 
     if(dataStageResult.length == 0)
         dataStageResult = processedRecords;

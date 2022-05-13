@@ -63,7 +63,7 @@ const processRecords = async () => {
         var finish = new Date();
         execTime = execTime + (Math.abs(finish - start) / 1000)
     }
-    console.info("Yughio Images Downloads completed " + execTime.toString())
+    console.info("Yugioh Images Downloads completed " + execTime.toString())
     //await updateDBImageUrl();
 
     //await updateImageIds();

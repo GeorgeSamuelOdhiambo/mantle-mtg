@@ -22,8 +22,8 @@ app.use(bodyParser.json());
 
 app.use('/', indexRouter);
 app.use('/images', imagesRouter);
-app.use('/yughio', yughioRouter);
-app.use('/yughio_images', yughioImgRouter);
+app.use('/yugioh', yughioRouter);
+app.use('/yugioh_images', yughioImgRouter);
 
 app.listen(2020,async()=> {
     console.info("Started")
