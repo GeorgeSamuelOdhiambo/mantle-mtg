@@ -56,12 +56,18 @@ const processRecords = async () => {
     var total = shortCodesId.length;
 
     while (shortCodesId.length) {
-        store.set("IMG_PROCESSING_COUNT", `remaining ${shortCodesId.length} of ${total}`);
-
-        var start = new Date();
-        await Promise.all(shortCodesId.splice(0, 100).map(downLoadImage));
-        var finish = new Date();
-        execTime = execTime + (Math.abs(finish - start) / 1000)
+        try {
+            console.log(`remaining ${shortCodesId.length} of ${total}`)
+            
+            store.set("IMG_PROCESSING_COUNT", `remaining ${shortCodesId.length} of ${total}`);
+    
+            var start = new Date();
+            await Promise.all(shortCodesId.splice(0, 100).map(downLoadImage));
+            var finish = new Date();
+            execTime = execTime + (Math.abs(finish - start) / 1000)
+        } catch (error) {
+            console.error(error)
+        }
     }
     console.info("Yugioh Images Downloads completed " + execTime.toString())
     //await updateDBImageUrl();
@@ -74,9 +80,14 @@ const processRecords = async () => {
 const downLoadImage = (shortCode) => new Promise(async (resolved, reject) => {
     try {
 
+        if(shortCode.includes('/')){
+            resolved()
+            return;
+        }
+        
         if (!fs.existsSync(resolve(downloadPath, `${shortCode}.jpg`))) {
             request
-                .get(`h ttps://static-3.studiobebop.net/ygo_data/card_variants/${shortCode}.jpg`)
+                .get(`https://static-3.studiobebop.net/ygo_data/card_variants/${shortCode}.jpg`)
                 .on("error", function (error) {
                     console.log(error, shortCode);
                     reject()

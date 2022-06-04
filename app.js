@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var imagesRouter = require('./routes/images');
 var yughioRouter = require('./routes/yughio');
 var yughioImgRouter = require('./routes/yughio_images');
+var pokemonRouter = require('./routes/pokemon');
 
 var app = express();
 
@@ -24,6 +25,7 @@ app.use('/', indexRouter);
 app.use('/images', imagesRouter);
 app.use('/yugioh', yughioRouter);
 app.use('/yugioh_images', yughioImgRouter);
+app.use('/pokemon', pokemonRouter);
 
 app.listen(2020,async()=> {
     console.info("Started")
