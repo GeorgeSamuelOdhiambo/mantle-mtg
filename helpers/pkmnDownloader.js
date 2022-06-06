@@ -222,6 +222,94 @@ const STORE_KEY = "7d315bbc";
 const X_TCG_ACCESS_TOKEN = 'be4eee1c-aeb5-49e4-8ddc-393a25858b6b';
 const VERSION = 'v1.39.0';
 var csvWriter = {}
+var failedId = []
+const reProcess = false;
+var faileRecords = []
+
+const pkmnConditions = [
+    {
+        "conditionId": 1,
+        "name": "Near Mint",
+        "abbreviation": "NM",
+        "displayOrder": 1
+    },
+    {
+        "conditionId": 2,
+        "name": "Lightly Played",
+        "abbreviation": "LP",
+        "displayOrder": 2
+    },
+    {
+        "conditionId": 3,
+        "name": "Moderately Played",
+        "abbreviation": "MP",
+        "displayOrder": 3
+    },
+    {
+        "conditionId": 4,
+        "name": "Heavily Played",
+        "abbreviation": "HP",
+        "displayOrder": 4
+    },
+    {
+        "conditionId": 5,
+        "name": "Damaged",
+        "abbreviation": "DM",
+        "displayOrder": 5
+    },
+    {
+        "conditionId": 6,
+        "name": "Unopened",
+        "abbreviation": "U",
+        "displayOrder": 6
+    }
+]
+
+const pkmnPrintings = [
+    {
+        "printingId": 10,
+        "name": "Normal",
+        "displayOrder": 1,
+        "modifiedOn": "2013-04-03T11:43:38.8"
+    },
+    {
+        "printingId": 11,
+        "name": "Holofoil",
+        "displayOrder": 2,
+        "modifiedOn": "2013-04-03T11:43:38.8"
+    },
+    {
+        "printingId": 77,
+        "name": "Reverse Holofoil",
+        "displayOrder": 3,
+        "modifiedOn": "2017-12-20T11:04:27.92"
+    },
+    {
+        "printingId": 78,
+        "name": "1st Edition",
+        "displayOrder": 4,
+        "modifiedOn": "2017-12-20T11:04:27.92"
+    },
+    {
+        "printingId": 79,
+        "name": "1st Edition Holofoil",
+        "displayOrder": 5,
+        "modifiedOn": "2017-12-20T11:04:27.92"
+    },
+    {
+        "printingId": 122,
+        "name": "Unlimited",
+        "displayOrder": 6,
+        "modifiedOn": "2021-10-14T21:29:33.397"
+    },
+    {
+        "printingId": 123,
+        "name": "Unlimited Holofoil",
+        "displayOrder": 7,
+        "modifiedOn": "2021-10-14T21:29:33.397"
+    }
+]
+
 
 exports.dwnExtract = async () => {
     processedRecords = [];
@@ -234,7 +322,7 @@ exports.dwnExtract = async () => {
         .get(href)
         .on("error", function (error) {
             console.log(error);
-            store.set("TASK_RUNNING", false);
+            store.set("PKMN_TASK_RUNNING", true);
         })
         .pipe(fs.createWriteStream(zipFile))
         .on("finish", async () => {
@@ -248,7 +336,7 @@ exports.dwnExtract = async () => {
 
             console.info("Downloads and Extracts completed at " + dt.toISOString())
 
-            store.set("TASK_RUNNING", false);
+            store.set("PKMN_TASK_RUNNING", true);
 
         });
 }
@@ -267,36 +355,65 @@ extractFiles = (zipFilePath, outputDirPath) => new Promise(async (resolved, reje
 });
 
 processPkmnFiles = () => new Promise(async (resolved, reject) => {
+    failedId = []
+    faileRecords = []
 
-    csvWriter = createCsvWriter({
-        path: resolve(outFilePath),
-        header: columns,
-        alwaysQuote: true
-    });
+    if(reProcess){
 
-    csvWriter.writeRecords([]).then(() => {
-        //Once 1st record is created, now allow append
+        let repro = fs.readFileSync("downloads/result/failed.json", { encoding: "utf8" });
+        faileRecords = JSON.parse(repro);
+
+        console.log("faileRecords")
+        console.log(faileRecords)
+
         csvWriter = createCsvWriter({
             path: resolve(outFilePath),
             header: columns,
             alwaysQuote: true,
             append: true
         });
-    })
+    }
+    else{
+        csvWriter = createCsvWriter({
+            path: resolve(outFilePath),
+            header: columns,
+            alwaysQuote: true,
+            //append: true
+        });
+        csvWriter.writeRecords([]).then(() => {
+            //Once 1st record is created, now allow append
+            csvWriter = createCsvWriter({
+                path: resolve(outFilePath),
+                header: columns,
+                alwaysQuote: true,
+                append: true
+            });
+        })
+    }
 
-    var files = getAllFiles(extractPath, []);
+    var files = getAllFiles(extractPath+'/pkmncards-main/data', []);
+    //files = files.splice(103)
 
     while (files.length) {
         console.log('Files Count')
         console.log(files.length)
 
-        const promises = files.splice(0, 10).map(file => processRecord(file));
+        const promises = files.splice(0, 50).map(file => processRecord(file));
         await Promise.all(promises).catch((error)=>{
             console.error("Files Promise", error)
         });
     }
 
     console.log("Processing Competed")
+
+    fs.writeFile("downloads/result/failed.json", JSON.stringify(failedId), 'utf8', function (err) {
+        if (err) {
+            console.log("An error occured while writing JSON Object to File.");
+            return console.log(err);
+        }
+     
+        console.log("JSON file has been saved.");
+    });
 
     /*files.slice(0,1).forEach(async(file) => {
         try {
@@ -347,10 +464,12 @@ const processRecord = (file) => new Promise(async (resolved, reject) => {
         let rawdata = fs.readFileSync(file, { encoding: "utf8" });
         let setRecords = JSON.parse(rawdata);
 
-        const promises = setRecords.map(record => mapRecords(record));
-        await Promise.all(promises).catch((error)=>{
-            console.error("ProcessRecord Promise", error)
-        });;
+        if(setRecords.length > 0){
+            const promises = setRecords.map(record => mapRecords(record));
+            await Promise.all(promises).catch((error)=>{
+                console.error("ProcessRecord Promise", error)
+            });
+        }
 
         /*for (let i = 0; i < setRecords.length; i++) {
             try {
@@ -367,6 +486,7 @@ const processRecord = (file) => new Promise(async (resolved, reject) => {
         }*/
     } catch (error) {
         console.error(error, 'files')
+        resolved()
     }
     resolved()
 });
@@ -376,46 +496,81 @@ const mapRecords = (data) => new Promise(async (resolved, reject) => {
     data = data.data;
 
     try {
-        var parentData = {
-            "Parent SKU": data.tcgplayer_id,
-            // "Mantle SKU": data.tcgplayer_id,
-            //"Child Sku": data.tcgplayer_id,
-            "Product Type": "Child",
-            "Product Line": "Pokemon",
-            "Category": data.pkmn_set,
-            "Parent Product Name": data.card_name,
-            //"Product Name": data.post_title,
-            //"Language": data.pkmn_language,
-            "Release Date": data.release_date_unix,
-            "Set Name": data.pkmn_set,
-            "Rarity": data.pkmn_rarity,
-            "Card Type": data.pkmn_stage,
-            "HP": data.pkmn_hp,
-            "Retreat Cost": data.pkmn_retreat_cost,
-            "Weakness": data["pkmn_weakness"]?.join(),
-            "Resistance": data["pkmn_resistance[]"]?.join(),
-            "Rules Text": data.card_text,
-            "Flavor Text": data.flavor_text,
-            "Artist": data["pkmn_artist[]"]?.join(),
-            "Card Number": data.card_number,
-            //"Foil": data.pkmn_print_type,
-            "Color": data["pkmn_color[]"]?.join()
-        }
 
-        if (data.tcgplayer_id != undefined && data?.tcgplayer_id?.toString() != "-1") {
+        if (data?.tcgplayer_id != undefined && data?.tcgplayer_id?.toString() != "-1") {
+            
+
+            if(reProcess){
+                const failed = faileRecords.filter(x => x.productId == data?.tcgplayer_id?.toString());
+                if(failed.length <= 0){
+                    console.log(`Already processed `)
+                    resolved()
+                    return;
+                }
+            }
+
+            var parentData = {
+                "Parent SKU": data.tcgplayer_id,
+                // "Mantle SKU": data.tcgplayer_id,
+                //"Child Sku": data.tcgplayer_id,
+                "Product Type": "Child",
+                "Product Line": "Pokemon",
+                "Category": data.pkmn_set,
+                "Parent Product Name": data.card_name,
+                //"Product Name": data.post_title,
+                //"Language": data.pkmn_language,
+                "Release Date": data.release_date_unix,
+                "Set Name": data.pkmn_set,
+                "Rarity": data.pkmn_rarity,
+                "Card Type": data.pkmn_stage,
+                "HP": data.pkmn_hp,
+                "Retreat Cost": data.pkmn_retreat_cost,
+                "Weakness": data["pkmn_weakness"]?.join(),
+                "Resistance": data["pkmn_resistance[]"]?.join(),
+                "Rules Text": data.card_text,
+                "Flavor Text": data.flavor_text,
+                "Artist": data["pkmn_artist[]"]?.join(),
+                "Card Number": data.card_number,
+                //"Foil": data.pkmn_print_type,
+                "Color": data["pkmn_color[]"]?.join()
+            }
             const header = await getRequestHeader()
 
-            const productDetails = await getProductDetails(data.tcgplayer_id, header)
-            //console.info("productDetails")
+            const productDetails = await getProductDetails(data.tcgplayer_id, header, data.post_ID)
+            //console.info("\r\nproductDetails received")
             //console.info(productDetails)
 
             if(productDetails != null){
                 for (let index = 0; index < productDetails?.results?.length; index++) {
     
                     try {
+                        //console.info("productSummary start")
+
                         const productDetail = productDetails.results[index];
-                        const url = api_url + `${VERSION}/stores/${STORE_KEY}/inventory/products?groupId=${productDetail.groupId}&productName=${productDetail.name}`
+                        //Only english
+                        if(productDetail.languageId == 1){
+
+                            const condition = pkmnConditions.find(x => x.conditionId == productDetail.conditionId);
+                            const printing = pkmnPrintings.find(x => x.printingId == productDetail.printingId);
+
+                            const skuDetails = {
+                                "Mantle SKU": productDetail.skuId.toString(),
+                                "Child Sku": productDetail.skuId.toString(),
+                                "Foil": null,
+                                "Language": 'English',
+                                "Condition": condition?.name,
+                                "Product Name": `${data.card_name} - ${condition?.name} ${printing?.name} English`,
+                            }
+
+                            processedRecords.push({ ...skuDetails, ...parentData });
+                        }
+
+
+                        /*const url = api_url + `${VERSION}/stores/${STORE_KEY}/inventory/products?groupId=${productDetail.groupId}&productName=${productDetail.name}`
                         const productSummary = await axios.get(url, header).catch(function (error) {
+
+                            failedId.push({productId:data.tcgplayer_id , post_ID:data.post_ID})
+                            
                             if (error.response) {
                                 // Request made and server responded
                                 console.log(error.response.data, 'productSummary');
@@ -428,21 +583,21 @@ const mapRecords = (data) => new Promise(async (resolved, reject) => {
                                 // Something happened in setting up the request that triggered an Error
                                 console.log(error.message, 'productSummary');
                             }
-                        });
+                        });*/
+                        //console.info("productSummary received")
     
-                        console.info("productSummary")
-                        //console.info(productSummary)
-    
-                        const results = productSummary?.data?.results;
+                        /*const results = productSummary?.data?.results;
                         if (results != undefined) {
                             const productSum = results.filter(x => x.productId.toString() === data.tcgplayer_id.toString());
-                            console.info(`productSummary ${data.tcgplayer_id}`)
                             
                             productSum.forEach(product => {
+
+                                if(product?.skus?.length == 0){
+                                    console.log(`No SKU`)
+                                    console.log(data.tcgplayer_id)
+                                }
                                 product?.skus?.forEach(sku => {
                                     if (sku.language.name == 'English') {
-
-                                        console.info(`productSummary  sku ${sku.skuId}`)
 
                                         const foil = sku.foil == true ? 'Foil' : 'Non Foil';
                                         const skuDetails = {
@@ -455,12 +610,11 @@ const mapRecords = (data) => new Promise(async (resolved, reject) => {
                                         }
     
                                         processedRecords.push({ ...skuDetails, ...parentData });
-                                        console.info(`productSummary  sku complted`)
                                     }
                                 })
                             })
-                            console.info(`productSummary   complted`)
-                        }
+                            //console.info(`productSummary   complted`)
+                        }*/
                     } catch (error) {
                         var err = error?.response?.data;
                         if (err == undefined)
@@ -473,13 +627,21 @@ const mapRecords = (data) => new Promise(async (resolved, reject) => {
 
             if (processedRecords.length > 0) {
 
+                //console.info(`writting ${processedRecords.length} records`)
                 csvWriter.writeRecords(processedRecords).then(() => {
+                    //console.info(`writting records completed`)
+                    resolved()
+                }).catch((err)=>{
+                    console.error("CSV WRITTER", err)
                     resolved()
                 })
             }
+            else{
+                resolved()
+            }
         }
         else {
-            console.info(`Undefined TCG ID for ${data.post_ID}`)
+            console.info(`Undefined TCG ID for ${data?.post_ID}`)
             resolved()
         }
 
@@ -496,6 +658,7 @@ const getRequestHeader = async () => {
 
 
     return {
+        'timeout': 60000,
         headers: {
             'Content-Type': 'application/json;charset=UTF-8',
             'X-Tcg-Access-Token': X_TCG_ACCESS_TOKEN,
@@ -530,16 +693,20 @@ const getBearerToken = async () => {
 
 }
 
-const getProductDetails = async (productId, header) => {
+const getProductDetails = async (productId, header, post_ID) => {
     try {
 
         //const header = await getRequestHeader()
 
-        const url = api_url + `${VERSION}/catalog/products/${productId}?getExtendedFields=true`
+        //const url = api_url + `${VERSION}/catalog/products/${productId}?getExtendedFields=true`
+        const url = api_url + `${VERSION}/catalog/products/${productId}/skus`
         const productDetails = await axios.get(url, header)
 
         return productDetails.data
     } catch (error) {
+
+        failedId.push({productId:productId , post_ID:post_ID})
+
         console.error(`Error ${productId}`)
     }
     return null
